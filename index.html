@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>070 SHAKE</title>
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <meta name="description" content="070 SHAKE SITE. Official site. merch , video, photos, and tour dates! 
+">
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+  <!-- Basic Page Info -->
+    <meta name="keywords" content="070 Shake , 070 , Project 070 , Shake The World , New Jersey , North Bergen , Tour , Tickets">
+    <meta property="og:title"        content="070 SHAKE">
+    <meta property="og:description"  content="070 SHAKE">
+    <meta property="og:url"          content="http://www.070shake.com">
+    <meta property="og:site_name"    content="070 SHAKE OFFICIAL SITE">
+    <meta property="og:type"         content="website">
+    <meta name="twitter:url"         content="http://www.070shake.com">
+    <meta name="twitter:title"       content="070 SHAKE">
+    <meta property="og:image"        content="assets/starsphere.jpg">
+    <meta name="twitter:image"       content="assets/starsphere.jpg">
+
+
+ <!-- Favicon -->
+    <link rel="shortcut icon" href="img/favicon.png" type="image/x-icon"> 
+    <link rel="apple-touch-icon-precomposed" sizes="57x57" href="/apple-touch-icon-57x57.png">
+    <link rel="apple-touch-icon-precomposed" sizes="114x114" href="/apple-touch-icon-114x144.png">
+    <link rel="apple-touch-icon-precomposed" sizes="72x72" href="/apple-touch-icon-72x72.png">
+    <link rel="apple-touch-icon-precomposed" sizes="144x144" href="/apple-touch-icon-144x144.png">
+    <meta name="apple-mobile-web-app-title" content="070 - Shake The World">
+    <meta name="application-name" content="070 Shake">
+    <meta name="msapplication-TileColor" content="#5b3c70">
+    <meta name="msapplication-TileImage" content="/mstile-144x144.png">
+
+<!-- Theme CSS -->
+    <link href="css/star-index/style.css" rel="stylesheet">
+
+        <style>
+            body {
+                margin: 0px;
+                overflow: hidden;
+                background-color: #000000;
+            }
+        </style>
+    </head>
+    <body>
+
+           <center>
+             <div class="main">
+                <h2><a href="tour">TOUR</a> &nbsp  <a href="music">MUSIC</a> &nbsp <a href="videos">VIDEOS</a> &nbsp <a href="http://shop.070shake.com">MERCH</a> &nbsp <a href="gallery">GALLERY</a> </h2> 
+             </div>
+            </center> 
+
+        <!--<div id="capture" >Capture</div>-->
+
+        <script>document.body.className += 'fade-out';</script>
+
+        <script src="js/shake.min.js"></script>
+        <script>
+            var camera, scene, renderer, group;
+            var tweenCamera = new THREE.Object3D();
+            var starsArray = []
+            var constellationsArray = []
+            var mobile = false;
+            var mouseEvent = {screenX: 0, screenY: 0};
+            var raycaster = new THREE.Raycaster();
+            var target = new THREE.Object3D();
+            var orgGeometry, object
+            var pointLight, equi
+            var targetObject = new THREE.Object3D();
+            var real = false;
+            var animatingConnections = false;
+            var config = {animTime: 2};
+            var domElement
+
+            init();
+            setup();
+
+            function init() {
+
+                // renderer
+
+                renderer = new THREE.WebGLRenderer({antialias: true});
+                renderer.setPixelRatio(window.devicePixelRatio);
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                domElement = renderer.domElement
+                document.body.appendChild(domElement);
+
+                // scene
+
+                scene = new THREE.Scene();
+
+                // camera
+
+                camera = new THREE.PerspectiveCamera(80, window.innerWidth / window.innerHeight, 0.1, 1100);
+                camera.position.set(-0.0008768520091151588, -0.00027108145039378184, -0.0003970458428986729)
+                camera.focalLength = camera.position.distanceTo(scene.position);
+
+                // controls
+
+                controls = new THREE.OrbitControls(camera);
+                controls.autoRotate = true;
+                controls.autoRotateSpeed = 0
+                controls.enableZoom = false
+                controls.enablePan = false
+                controls.enableDamping = true
+                controls.dampingFactor = .2
+                controls.rotateSpeed = .07
+
+                if (WEBVR.isAvailable() === true) {
+                    controls = new THREE.VRControls(camera);
+                    controls.standing = false;
+
+                    renderer = new THREE.VREffect(renderer);
+                    document.body.appendChild(WEBVR.getButton(renderer));
+                }
+
+                // events
+
+                window.addEventListener('deviceorientation', setOrientationControls, true);
+                window.addEventListener('resize', onWindowResize, false);
+
+                if (real) {
+                    equi = new THREE.CubemapToEquirectangular(renderer, true);
+                    document.getElementById('capture').addEventListener('click', function (e) {
+                        equi.update(camera, scene);
+                    });
+                }
+
+            }
+
+            function start() {
+                requestAnimationFrame(render)
+                requestAnimationFrame(animateIn)
+            }
+            function animateIn() {
+                TweenMax.to(domElement.style, 2, {opacity: 1, onComplete: showLines})
+                TweenMax.to(controls, 5, {autoRotateSpeed: -0.1})
+            }
+            function showLines() {
+                animatingConnections = true;
+                TweenMax.to(config, 1, {animTime: .3})
+
+            }
+
+            function setup() {
+                // beginning of cubemap
+                var id = 0
+                if (real)
+                    id = 1
+                var cubeMap = getCubeMap(id)//11)
+
+                var cubeShader = THREE.ShaderLib['cube'];
+                cubeShader.uniforms['tCube'].value = cubeMap
+
+                var skyBoxMaterial = new THREE.ShaderMaterial({
+                    fragmentShader: cubeShader.fragmentShader,
+                    vertexShader: cubeShader.vertexShader,
+                    uniforms: cubeShader.uniforms,
+                    depthWrite: false,
+                    side: THREE.BackSide
+                });
+
+                var skyBox = new THREE.Mesh(new THREE.CubeGeometry(1000, 1000, 1000, 1, 1, 1), skyBoxMaterial);
+                scene.add(skyBox);
+
+                var geo = new THREE.BoxGeometry(1, 1, 1, 1, 1, 1);
+                var mat = new THREE.MeshBasicMaterial({color: 0xFFFFFF});
+
+                var length = stars.length;
+                var radius = 1000;
+
+                var pointsGeometry = new THREE.Geometry();
+
+                var geom = new THREE.Geometry()
+
+                for (var i = 0; i < length; i++) {
+                    var s = stars[i];
+
+                    var sizeOffset = (1.0 - (s.mag + 1.5) / 7.5) * 2 + 1;
+                    sizeOffset = Math.pow(3, sizeOffset) * 7;
+                    //cube.scale.x = cube.scale.y = cube.scale.z = sizeOffset / 5
+
+                    var position = new THREE.Vector3()
+
+                    //var v = new THREE.Vector3(radius, 0, 0);
+                    position.x = radius
+
+                    //mat4.rotateY(m, s.ra * Math.PI / 180);
+                    //mat4.rotateZ(m, -s.de * Math.PI / 180);
+
+                    position.applyAxisAngle(new THREE.Vector3(0, 0, 1), (s.de) * Math.PI / 180)
+                    position.applyAxisAngle(new THREE.Vector3(0, 1, 0), (s.ra) * Math.PI / 180)
+
+                    //position.y-=10
+                    position.y -= 4 * 3
+                    position.z += 4
+
+                    pointsGeometry.vertices.push(position)
+
+                    var sphereGeom = new THREE.PlaneGeometry(1, 1)
+                    change_uvs(sphereGeom, 1 / 4, 1 / 4, Math.floor(Math.random() * 4), Math.floor(Math.random() * 4));
+
+                    var mesh = new THREE.Mesh(sphereGeom)
+                    mesh.scale.set(sizeOffset, sizeOffset, sizeOffset)
+                    mesh.position.copy(position)
+                    mesh.lookAt(scene.position)
+                    mesh.updateMatrix();
+                    geom.merge(mesh.geometry, mesh.matrix);
+
+                    starsArray[s.id] = position;
+                    //scene.add(cube)
+                }
+                if (real) {
+
+                    var texture = new THREE.TextureLoader().load("assets/stars.png");
+                    texture.wrapS = THREE.RepeatWrapping;
+                    texture.wrapT = THREE.RepeatWrapping;
+                    texture.repeat.set(1, 1);
+
+                    var mat = new THREE.MeshBasicMaterial({blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false, map: texture, transparent: true, color: 0xFFFFFF});
+
+
+                    var starsMesh = new THREE.Mesh(geom, mat);
+                    scene.add(starsMesh)
+                }
+
+                length = constellations.length;
+                var lineMat = new THREE.LineBasicMaterial({blending: THREE.AdditiveBlending, color: 0xFFFFFF, depthTest: false, depthWrite: false, transparent: true, opacity: .85})
+                for (var i = 0; i < length; i++) {
+                    var c = constellations[i];
+                    for (j = 0; j < c.lines.length; j++) {
+                        var geometry = new THREE.Geometry();
+                        geometry.vertices.push(new THREE.Vector3());
+                        geometry.vertices.push(starsArray[c.lines[j][1]].clone().sub(starsArray[c.lines[j][0]]));
+                        geometry.computeBoundingBox()
+                        var object = new THREE.Line(geometry, lineMat);
+                        object.scale.x = object.scale.y = object.scale.z = .00001
+                        object.position.copy(starsArray[c.lines[j][0]])
+                        scene.add(object)
+                        constellationsArray.push(object)
+
+                        if (j == Math.round(c.lines.length * .75)) {
+                            var material = lineMat//new THREE.LineBasicMaterial({color: 0xffffff, opacity: 1, transparent: true});
+                            var text = new THREE.LineSegments(new Text(c.id.toUpperCase()), material);//getText(c.id)
+                            text.scale.set(5, 5, 5)
+                            text.position.x = -5 * 3 * c.id.length / 2
+                            text.position.y = -5 * 2
+                            text.updateMatrix();
+                            text.geometry.applyMatrix(text.matrix);
+
+                            text.position.copy(object.position)
+                            text.position.y -= 25
+                            text.scale.set(.00001, .00001, .00001)
+                            text.position.multiplyScalar(.9)
+                            text.lookAt(scene.position)
+                            scene.add(text)
+                            constellationsArray.push(text)
+                        }
+                    }
+
+                }
+
+                //targetObject.add(new THREE.Mesh(new THREE.BoxGeometry(10,10,10),new THREE.MeshBasicMaterial({color:0xFF0000})))
+                scene.add(targetObject)
+
+            }
+
+            function change_uvs(geometry, unitx, unity, offsetx, offsety) {
+                var faceVertexUvs = geometry.faceVertexUvs[ 0 ];
+                for (var i = 0; i < faceVertexUvs.length; i++) {
+                    var uvs = faceVertexUvs[ i ];
+                    for (var j = 0; j < uvs.length; j++) {
+                        var uv = uvs[ j ];
+                        uv.x = (uv.x + offsetx) * unitx;
+                        uv.y = (uv.y + offsety) * unity;
+                    }
+                }
+            }
+
+            var time = 0;
+            function render() {
+                time += 0.1
+                requestAnimationFrame(render);
+
+                controls.update();
+
+                targetObject.rotation.copy(camera.rotation)
+                targetObject.position.set(0, 0, 0)
+                targetObject.translateZ(-900);
+
+                //console.log(constellationsArray[0].position.distanceTo(targetObject.position))
+                //if (!real) {
+                if (animatingConnections) {
+                    for (var i = 0; i < constellationsArray.length; i++) {
+                        if (constellationsArray[i].position.distanceTo(targetObject.position) > 400) {
+                            if (constellationsArray[i].scale.x > 0.0001) {
+                                TweenMax.to(constellationsArray[i].scale, config.animTime, {x: 0.0001, y: 0.0001, z: 0.0001})
+                            } else {
+                                constellationsArray[i].visible = false
+                            }
+                        } else {
+                            if (constellationsArray[i].scale.x != 1)
+                                TweenMax.to(constellationsArray[i].scale, config.animTime, {x: 1, y: 1, z: 1})
+                            constellationsArray[i].visible = true
+                        }
+                    }
+                }
+                //}
+
+                if (mobile) {
+                    /*TweenMax.to(camera.quaternion, .3, {
+                     x: tweenCamera.quaternion.x,
+                     y: tweenCamera.quaternion.y,
+                     z: tweenCamera.quaternion.z,
+                     w: tweenCamera.quaternion.w,
+                     });*/
+                    camera.position.set(0, 0, 0)
+                    camera.translateZ(.0001);
+                }
+                renderer.render(scene, camera);
+
+            }
+
+        </script>
+
+    <!-- Google Analytics -->
+    <script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-83907430-1', 'auto');
+  ga('send', 'pageview');
+
+            window.onload = function () { document.body.className = ""; }
+
+        </script>
+
+    </body>
+</html>

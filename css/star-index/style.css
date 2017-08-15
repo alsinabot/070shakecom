@@ -1,0 +1,144 @@
+ body {
+        margin: 0px;
+        overflow: hidden;
+        background-color: #000000;
+        opacity: 1;
+        transition: 2s opacity;
+      }
+
+a:hover {
+    color: black;
+}
+
+a:link {
+    color: white;
+    text-decoration: none;
+}
+
+a:visited {
+  color: white;
+  text-decoration: none;
+}
+
+
+body.fade-out {
+    opacity: 0;
+    transition: none;
+}
+
+.main {
+  position: absolute;
+  list-style: none; 
+  width: 100%; 
+  margin: 0 0 3em 0;
+  padding: 0;
+  left: 0;
+  right: 0;
+  margin-top: 40px; 
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-transform: uppercase;
+  color: white;
+  font-family: 'Arial Bold', sans-serif; 
+  font-weight: 600;
+  letter-spacing: 2px;
+  word-spacing: 30px;
+}
+
+p {
+  margin: 0 0 20px;
+  font-size: 18px;
+  line-height: 1.5;
+  font-family: 'Arial Bold', sans-serif;
+}
+
+@media (min-width: 768px) {
+  p {
+    margin: 0 0 30px;
+    font-size: 20px;
+    line-height: 1.6;
+  }
+}
+
+
+
+/* ----------- iPhone 5 and 5S ----------- */
+
+/* Portrait and Landscape */
+
+@media only screen 
+  and (min-device-width: 320px) 
+  and (max-device-width: 568px)
+  and (-webkit-min-device-pixel-ratio: 2) {
+
+  .main {
+  position: absolute;
+  list-style: none; 
+  width: 100%; 
+  margin: 0 0 3em 0;
+  padding: 0;
+  left: 0;
+  right: 0;
+  margin-top: 10px; 
+
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  text-transform: uppercase;
+  color: white;
+  font-family: "Montserrat", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  font-weight: 600;
+  letter-spacing: 2px;
+  font-size: small;
+  word-spacing: initial;
+}
+
+}
+
+/* ----------- iPhone 6 ----------- */
+
+/* Portrait and Landscape */
+@media only screen 
+  and (min-device-width: 375px) 
+  and (max-device-width: 667px) 
+  and (-webkit-min-device-pixel-ratio: 2) { 
+
+  .main {
+  position: absolute;
+  left: 0;
+  right: 0;
+  word-spacing: 10px; 
+  margin-top: 15px; 
+}
+
+}
+
+
+/* ----------- iPhone 6+ ----------- */
+
+/* Portrait and Landscape */
+@media only screen 
+  and (min-device-width: 414px) 
+  and (max-device-width: 736px) 
+  and (-webkit-min-device-pixel-ratio: 3) { 
+
+  .main {
+  position: absolute;
+  left: 0;
+  right: 0;
+  word-spacing: 10px; 
+  margin-top: 20px; 
+}
+
+}
