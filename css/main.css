@@ -95,7 +95,6 @@ a {
     max-height: 80vh;
     position: relative;
     overflow: hidden;
-    background-color: red;
 }
 
 @media only screen and (min-device-width: 320px) and (max-width: 768px) {
